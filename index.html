@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/roboto.min.css" rel="stylesheet">
+  <link href="css/material.min.css" rel="stylesheet">
+  <link href="css/ripples.min.css" rel="stylesheet">
+  <style>
+    #input h2 {
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 400;
+    }
+    #input .inputs {
+      width: 80%;
+    }
+    #input .form-control-wrapper {
+      margin: 30px 0;
+    }
+    #shadow h2 {
+    padding: 14px;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+  }
+  #shadow .sample {
+    width:  100px;
+    height: 100px;
+    margin: 16px;
+    padding: 16px;
+    display: inline-block;
+  }
+  .task{
+    margin-top: 25px;
+  }
+  #error-todo,#error-description{color:red;}
+  </style>
+</head>
+<body style="background:#fff">
+
+
+  <div id="header"></div>
+  <hr>
+  <div id="content" class="container">
+<div id="validate"></div>
+</div>  
+        <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+        <script src="js/ripples.min.js"></script>
+        <script src="js/material.min.js"></script>
+        <script src="https://fb.me/react-0.13.3.js"></script>
+        <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
+        <script>
+            $(document).ready(function() {
+                // This command is used to initialize some elements and make them work properly
+                $.material.init();
+            });
+        </script>
+   
+    <script type="text/jsx">
+    var Header=React.createClass({
+      render:function()
+      {
+        return (<nav class="navbar navbar-primary">
+  <div className="container-fluid">
+    <div className="navbar-header">
+      <a className="navbar-brand" href="#">
+       TODO APP
+      </a>
+    </div>
+  </div>
+</nav>);
+      }
+    });
+    React.render(<Header />,document.getElementById('header'));
+
+   var RenderTodo=React.createClass({
+     removeTodo: function(e){
+      e.preventDefault();
+      this.props.removeTodo();
+       },
+    render:function()
+    {
+
+      return (
+    <div className="col-sm-4">
+    <div className="sample shadow-z-2 task">
+    <input type="button" className="btn btn-danger btn-sm" onClick={this.removeTodo} value="delete" />
+    <b>{this.props.todo}</b><p><i>{this.props.description}</i></p>
+    <br />
+    <i>{this.props.timeTodo}</i>
+    </div>
+    </div>);
+    }
+   });
+   var Todo=React.createClass(
+   {
+    getInitialState:function()
+    {
+      return {items:[],todo:'',timeTodo:'',description:''};
+    },
+    onChangeTodo:function(e)
+    {
+        this.setState({todo:e.target.value});
+    },
+    onChangeTimeTodo:function(e)
+    {
+        this.setState({timeTodo:e.target.value});
+    },
+    onChangeDescription:function(e)
+    {
+        this.setState({description:e.target.value});
+    }
+    ,
+    handleSubmit:function(e)
+    {
+      e.preventDefault();
+      if (this.state.todo == '' || this.state.description== '') 
+        {
+          if (this.state.todo == '' ) 
+          {
+           document.getElementById('error-todo').innerHTML='Todo is required';
+          
+          }
+          if (this.state.description== '') 
+          {
+            document.getElementById('error-description').innerHTML='Description is required';
+          }
+          return false;
+        }
+        else
+        {
+      this.state.items.push({todo:this.state.todo,timeTodo:this.state.timeTodo,description:this.state.description});
+      this.setState({todo:'',timeTodo:'',description:''});
+      console.log(this.state.items);
+      document.getElementById('todo').value='';
+      document.getElementById('description').value='';
+      document.getElementById('error-todo').innerHTML='';
+      document.getElementById('error-description').innerHTML='';
+       }
+    },
+    handleRemove:function(index)
+    {
+      console.log('checked');
+      this.state.items.splice(index,1);
+      this.setState({item:this.state.items});
+    }
+    ,
+    render:function()
+    {
+      var listTodo=this.state.items.map(function(data,index){
+          return (<RenderTodo removeTodo={this.handleRemove.bind(this,index)} todo={data.todo} timeTodo={data.timeTodo} description={data.description} />);
+      }.bind(this));
+        return (
+        <div class="row">
+  <div className="col-sm-3" id="content-left">
+<form onSubmit={this.handleSubmit}>
+          <span>TODO</span>
+          <input type="text" className="form-control floating-label" id="todo" value={this.todo} onChange={this.onChangeTodo}  />
+          <span id="errorTodo"><p id="error-todo"></p></span>
+          <span>TIME</span>
+          <input type="date" className="form-control" value={this.timeTodo} onChange={this.onChangeTimeTodo} />
+          <span>DESCRIPTION</span>
+          <textarea className="form-control floating-label" id="description" value={this.description} onChange={this.onChangeDescription} />
+          <span id="errorDescription"><p id="error-description"></p></span>
+          <button className="btn btn-primary btn-sm">submit</button>
+</form>
+  </div><div className="col-sm-9" id="content-right">{listTodo}</div>
+</div>);
+    }
+   });
+React.render(<Todo />,document.getElementById('content'));
+    </script>
+</body>
+</html>
